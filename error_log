@@ -1,0 +1,7 @@
+[13-Aug-2020 13:45:17 UTC] PHP Fatal error:  Cannot redeclare Api::updateUsersIncomedetails() in /home/y4vjealborkl/public_html/fuela/application/controllers/Api.php on line 234
+[13-Aug-2020 13:47:07 UTC] PHP Fatal error:  Cannot redeclare Api::updateUsersIncomedetails() in /home/y4vjealborkl/public_html/fuela/application/controllers/Api.php on line 234
+[13-Aug-2020 13:47:09 UTC] PHP Fatal error:  Cannot redeclare Api::updateUsersIncomedetails() in /home/y4vjealborkl/public_html/fuela/application/controllers/Api.php on line 234
+[13-Aug-2020 13:47:10 UTC] PHP Fatal error:  Cannot redeclare Api::updateUsersIncomedetails() in /home/y4vjealborkl/public_html/fuela/application/controllers/Api.php on line 234
+[13-Aug-2020 13:47:12 UTC] PHP Fatal error:  Cannot redeclare Api::updateUsersIncomedetails() in /home/y4vjealborkl/public_html/fuela/application/controllers/Api.php on line 234
+[13-Aug-2020 13:47:16 UTC] PHP Fatal error:  Cannot redeclare ApiModel::updateUsersIncomedetails() in /home/y4vjealborkl/public_html/fuela/application/models/ApiModel.php on line 170
+[13-Aug-2020 13:47:19 UTC] PHP Fatal error:  Cannot redeclare ApiModel::updateUsersIncomedetails() in /home/y4vjealborkl/public_html/fuela/application/models/ApiModel.php on line 170
