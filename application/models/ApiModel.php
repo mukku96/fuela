@@ -53,7 +53,7 @@ class ApiModel extends CI_Model
     public function checkold(){
         $this->db->select('*');
         $this->db->from('fa_users');
-        $this->db->where('password',$this->input->post('old_pass'));
+        $this->db->where('password', $this->security->xss_clean(hash('sha256', $this->input->post('old_pass'))));
         $this->db->where('id',$this->input->post('user_id'));
         $sel = $this->db->get();
         return $sel->row_array();
@@ -543,6 +543,16 @@ class ApiModel extends CI_Model
         $this->db->insert('fa_users_helpquery', $query_data);
         return $this->db->insert_id();
     }
+    public function account_approval()
+    {
+        $data = array(
+            'user_status' => $this->security->xss_clean($this->input->post('key'))
+        );
+        $this->db->update('fa_users', $data, ['id' => $this->security->xss_clean($this->input->post('user_id'))]);
+        $this->db->affected_rows();
+        $query = $this->db->get_where('fa_users', ['id' => $this->security->xss_clean($this->input->post('user_id'))]);
+        return $query->row_array();
+    }
 
     public function get_conatct_detail(){
         $query = $this->db->get('fa_contacts');
@@ -553,5 +563,21 @@ class ApiModel extends CI_Model
         $user_id = $this->security->xss_clean($this->input->post('user_id'));
         $this->db->update('fa_users', ['deleted_at'=>date('Y-m-d H:i:s')], ['id' => $user_id]);
         return $this->db->affected_rows();
+    }
+    public function getQuationData(){
+        $this->db->select('user_id, value as user_demand, admin_value, interest_rate');
+        $query = $this->db->get_where('fa_users_credit', ['user_id' => $this->security->xss_clean($this->input->post('user_id'))]);
+        return $query->row_array();
+    }
+
+    public function change_profile($user_id, $image_url){
+        $this->db->update('fa_users', ['image_url' => $image_url], ['id'=>$user_id]);
+        return $this->db->affected_rows();
+    }
+
+    public function get_profile_date($user_id){
+        $this->db->select('*, id as user_id');
+        $query = $this->db->get_where('fa_users', ['id' => $user_id]);
+        return $query->row_array();
     }
 }

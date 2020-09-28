@@ -10,7 +10,7 @@
 
         <ul class="nav">
 
-          <li class="nav-item <?php if($title == 'Home' || $title == 'Edit Profile' || $title == 'Change Password') { echo "active"; } ?>">
+          <li class="nav-item <?php if($title == 'Dashboard' || $title == 'Edit Profile' || $title == 'Change Password') { echo "active"; } ?>">
 
             <a class="nav-link" href="<?php echo base_url('admin/home');?>">
 
@@ -101,9 +101,9 @@
         <div class="container-fluid">
 
           <div class="navbar-wrapper">
-
-            <a class="navbar-brand" href="<?php echo base_url('admin/home');?>">Dashboard</a>
-
+          <?php if(!empty($title)) { ?>
+            <a class="navbar-brand" href="<?php echo base_url('admin/home');?>"><?php echo $title; ?></a>
+          <?php } ?>
           </div>
 
           <button class="navbar-toggler" type="button" data-toggle="collapse" aria-controls="navigation-index" aria-expanded="false" aria-label="Toggle navigation">

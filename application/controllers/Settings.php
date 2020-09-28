@@ -33,8 +33,10 @@ class Settings extends CI_Controller
         if($this->session->userdata('admin_emailid') == false){
             return redirect('admin/login');
         }
+        
         $data['title'] = 'Legal Policy';
         $key = 'legal';
+        $data['page_url']=current_url();
         $data['settings'] = $this->SettingsModel->get_settings($key);
 		$this->load->view('admin/layouts/header', $data);
 		$this->load->view('admin/layouts/sidebar');
@@ -48,6 +50,7 @@ class Settings extends CI_Controller
         }
         $data['title'] = 'Terms and Condition';
         $key = 'term';
+        $data['page_url']=current_url();
         $data['settings'] = $this->SettingsModel->get_settings($key);
 		$this->load->view('admin/layouts/header', $data);
 		$this->load->view('admin/layouts/sidebar');
@@ -62,10 +65,10 @@ class Settings extends CI_Controller
             $this->output->set_output(json_encode(['result' => 0, 'errors' => $this->form_validation->error_array()]));
             return FALSE;
         }
-        
+        $page_url = $this->input->post('page_url');
         $result = $this->SettingsModel->do_update_settings();
         if (!empty($result)) {
-            $this->output->set_output(json_encode(['result' => 1, 'msg' => 'updated Successful.']));
+            $this->output->set_output(json_encode(['result' => 1, 'msg' => 'updated Successful.', 'url' =>$page_url]));
             return FALSE;
         } else {
             $this->output->set_output(json_encode(['result' => -1, 'msg' => 'Not updated.']));

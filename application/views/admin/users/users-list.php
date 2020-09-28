@@ -66,7 +66,7 @@
 
                           <td>  <?php echo $user['is_block']; ?></td>
 
-                          <td>  Action </td>
+                          <td>  <a href="<?php echo base_url('users/view-user-detail/'.$user['id']);?>"><i class="fa fa-eyes"></i> view</a> </td>
 
                         </tr>
 

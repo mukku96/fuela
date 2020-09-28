@@ -51,8 +51,10 @@ class Api extends CI_Controller
             $this->output->set_output(json_encode(['result' => -1, 'msg' => 'The Mobile No is already taken.', 'data' => null]));
             return false;
         }
-
-        $image = $this->doUploadImage('image_url');
+        $image = "";
+        if(!empty($_FILES['image_url']['name'])){
+            $image = $this->doUploadImage('image_url');    
+        }
         $results = $this->ApiModel->user_registration($image);
         if ($results) {
             unset($results['id']);
@@ -61,7 +63,7 @@ class Api extends CI_Controller
             }
             $results['confirm_password'] = $this->input->post('confirm_password');
             $results['step'] = "2";
-            $this->output->set_output(json_encode(['result' => 1, 'msg' => 'Step1 Registration Successfull.', 'data' => $results]));
+            $this->output->set_output(json_encode(['result' => 1, 'msg' => 'First Step Registration Successful.', 'data' => $results]));
             return false;
         } else {
             $this->output->set_output(json_encode(['result' => -1, 'msg' => 'Something Went Wrong.', 'data' => null]));
@@ -109,7 +111,7 @@ class Api extends CI_Controller
 
         if ($results) {
             $results['step'] = "3";   
-            $this->output->set_output(json_encode(['result' => 1, 'msg' => 'Step2 Registration Successfull.', 'data' => $results]));
+            $this->output->set_output(json_encode(['result' => 1, 'msg' => 'Second Step Registration Successful.', 'data' => $results]));
             return false;
         } else {
             $this->output->set_output(json_encode(['result' => -1, 'msg' => 'Something Went Wrong.', 'data' => null]));
@@ -129,18 +131,22 @@ class Api extends CI_Controller
         } 
         $checkold = $this->ApiModel->checkold();
         if($checkold){
-            if($this->input->post('old_pass') == $this->input->post('new_pass')){
-             $this->output->set_output(json_encode(['result' => -1, 'msg' =>'New password should not be same as old password' , 'data' => null]));   
+            if($this->security->xss_clean(hash('sha256', $this->input->post('old_pass'))) == $this->security->xss_clean(hash('sha256', $this->input->post('new_pass')))){
+             $this->output->set_output(json_encode(['result' => -1, 'msg' =>'New password should not be same as old password' , 'data' => null])); 
+             return false;
             }else{               
                 $changePass = $this->ApiModel->changePass();
                 if($changePass){
                         $this->output->set_output(json_encode(['result' => 1, 'msg' =>'Password changed successfully' , 'data' => 'Password changed successfully']));
+                        return false;
                     }else{
                         $this->output->set_output(json_encode(['result' => 0, 'msg' =>'Updation Failed' , 'data' => null]));
+                        return false;
                     }
             }  
         }else{
             $this->output->set_output(json_encode(['result' => -1, 'msg' =>'Incorrect old password' , 'data' => null]));
+            return false;
         }
     }
 
@@ -241,7 +247,7 @@ class Api extends CI_Controller
 
         $this->form_validation->set_rules('salary_date', 'salary date', 'trim|required');
 
-        $this->form_validation->set_rules('additional_income', 'additional income', 'trim|required');
+        $this->form_validation->set_rules('additional_income', 'additional income', 'trim');
 
         $this->form_validation->set_rules('total_income', 'total income', 'trim|required');
 
@@ -285,7 +291,7 @@ class Api extends CI_Controller
 
         $this->form_validation->set_rules('salary_date', 'salary date', 'trim|required');
 
-        $this->form_validation->set_rules('additional_income', 'additional income', 'trim|required');
+        $this->form_validation->set_rules('additional_income', 'additional income', 'trim');
 
         $this->form_validation->set_rules('total_income', 'total income', 'trim|required');
 
@@ -317,7 +323,7 @@ class Api extends CI_Controller
 
             $results['step'] = "4";
 
-            $this->output->set_output(json_encode(['result' => 1, 'msg' => 'Step3 Registration Successfull.', 'data' => $results]));
+            $this->output->set_output(json_encode(['result' => 1, 'msg' => 'Third Step Registration Successful.', 'data' => $results]));
 
             return false;
 
@@ -417,7 +423,7 @@ class Api extends CI_Controller
 
             $results['step'] = "5";
 
-            $this->output->set_output(json_encode(['result' => 1, 'msg' => 'Step4 Registration Successfull.', 'data' => $results]));
+            $this->output->set_output(json_encode(['result' => 1, 'msg' => 'Fourth Step Registration Successful.', 'data' => $results]));
 
             return false;
 
@@ -633,9 +639,7 @@ class Api extends CI_Controller
 
             if(empty($chk_income)){
 
-                $results = [];
-
-                $results = $chk_work;
+                $results = array_merge($results, $chk_work);
 
                 $results['step'] = "3";
 
@@ -649,9 +653,7 @@ class Api extends CI_Controller
 
             if(empty($chk_bank)){
 
-               $results = [];
-
-               $results = $chk_income;
+               $results = array_merge($results, $chk_income);
 
                $results['step'] = "4";
 
@@ -664,11 +666,7 @@ class Api extends CI_Controller
             $chk_credit = $this->ApiModel->getCreditDetailByUserId($results['user_id']);
 
             if(empty($chk_credit)){
-
-               $results = [];
-
-               $results = $chk_bank;
-
+                $results = array_merge($results, $chk_bank);
                $results['step'] = "5";
 
                $this->output->set_output(json_encode(['result' => 1, 'msg' => 'Login in Successful.', 'data' => $results]));
@@ -693,7 +691,7 @@ class Api extends CI_Controller
 
         } else {
 
-            $this->output->set_output(json_encode(['result' => -1, 'msg' => 'Email ID or Password is not correct.', 'data' => 'Email ID or Password is not correct.']));
+            $this->output->set_output(json_encode(['result' => -1, 'msg' => 'Email ID or Password is not correct.', 'data' => null]));
 
             return false;
 
@@ -1008,22 +1006,14 @@ class Api extends CI_Controller
     public function downloadPdf()
 
 	{
-
 	    $data['title'] = "PDF";
-
-		$this->load->view('admin/downloadPdf', $data);
-
-// 		$html = $this->output->get_output();
-
-//         $this->load->library('pdf');
-
-//         $this->dompdf->loadHtml($html);
-
-//         $this->dompdf->setPaper('A4', 'portrait');
-
-//         $this->dompdf->render();
-
-//         $this->dompdf->stream("welcome.pdf", array("Attachment"=>0));
+        $this->load->view('admin/downloadPdf', $data);
+        $html = $this->output->get_output();
+        $this->load->library('pdf');
+        $this->dompdf->loadHtml($html);
+        $this->dompdf->setPaper('A4', 'portrait');
+        $this->dompdf->render();
+        $this->dompdf->stream(time().".pdf", array("Attachment"=>0));
 
     }
     
@@ -1139,5 +1129,71 @@ class Api extends CI_Controller
             $this->output->set_output(json_encode(['result' => -1, 'msg' => 'Not deleted.']));
             return false;
         }
+	} 
+    public function quatation(){
+        $this->output->set_content_type('application/json');
+        $this->form_validation->set_rules('user_id', 'User Id', 'trim|required');
+	    $result = $this->ApiModel->getQuationData();
+        if ($result) {
+            if($result['admin_value'] == ''){
+                $this->output->set_output(json_encode(['result' => -1, 'msg' => 'Your Account is under observation!..', 'data' => null]));
+                return true;    
+            }else{
+                $this->output->set_output(json_encode(['result' => 1, 'msg' => 'Data Found', 'data' => $result]));
+                return true;
+            }
+        } else {
+            $this->output->set_output(json_encode(['result' => -1, 'msg' => 'No Data Found.', 'data' => null]));
+            return false;
+        }
 	}
+	
+	public function account_approval(){
+	    $this->output->set_content_type('application/json');
+        $this->form_validation->set_rules('user_id', 'User Id', 'trim|required');
+        $this->form_validation->set_rules('key', 'key', 'trim|required');
+        if ($this->form_validation->run() === false) {
+            $this->output->set_output(json_encode(['result' => 0, 'errors' => $this->form_validation->error_array()]));
+            return false;
+        }
+	    $result = $this->ApiModel->account_approval();
+        if ($result) {
+            $this->output->set_output(json_encode(['result' => 1, 'msg' => 'Data Found', 'data' => $result]));
+            return true;
+        } else {
+            $this->output->set_output(json_encode(['result' => -1, 'msg' => 'Something Went Wrong!!.', 'data' => null]));
+            return false;
+        }
+    }
+    
+    public function change_profile(){
+        $this->output->set_content_type('application/json');
+        $this->form_validation->set_rules('user_id', 'User ID', 'trim');
+
+        if ($this->form_validation->run() === false) {
+            $this->output->set_output(json_encode(['result' => 0, 'errors' => $this->form_validation->error_array()]));
+            return false;
+        }
+        $user_id = $this->security->xss_clean($this->input->post('user_id'));
+        if (!empty($_FILES['image_url']['name'])) {
+            $image_url = $this->doUploadImage('image_url');  
+        } else {
+            $image_url = '';
+        }
+      
+        $updated = $this->ApiModel->change_profile($user_id, $image_url);
+        if ($updated) {
+            $results = $this->ApiModel->get_profile_date($user_id);
+            if (!empty($results['image_url'])) {
+                $results['image_url'] = base_url('uploads/users/'.$results['image_url']);
+            } else {
+              $results['image_url'] = null;
+            }
+            $this->output->set_output(json_encode(['result' => 1, 'msg' => 'Successfully updated your profile.', 'data' => $results]));
+            return true;
+        } else {
+            $this->output->set_output(json_encode(['result' => -1, 'msg' => 'No changes found your profile.', 'data' => Null]));
+            return false;
+        }
+    }
 }

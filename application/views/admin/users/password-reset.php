@@ -88,26 +88,6 @@
 
 					</div>
 
-
-
-					<div class="text-center p-t-45 p-b-4">
-
-						<span class="txt1">
-
-							Go back :
-
-						</span>
-
-
-
-						<a href="<?php echo base_url('admin/login'); ?>" class="txt2 hov1">
-
-							Login panel
-
-						</a>
-
-					</div>
-
 				</form>
 
 			</div>
